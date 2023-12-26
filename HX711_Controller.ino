@@ -10,7 +10,7 @@
 #include <HX711_ADC.h>
 
 //************************************************
-// Diese Werte können angepasst werden
+// This values can be adopted to your need
 //************************************************
 // Power definitions
 const int KRAFT1 = 20;
@@ -30,6 +30,9 @@ const bool DEBUG = true;
 
 //activate tare during startup
 const bool TARE_AT_START = true;
+
+float calibrationValue = 1000.0;  // set correct calibration value, if absolut weight is important
+
 //*********************************************
 
 //pins:
@@ -82,14 +85,11 @@ void setup() {
   Serial.println();
   Serial.println("Starting...");
 
-  float calibrationValue;    // calibration value
-  calibrationValue = 696.0;  // uncomment this if you want to set this value in the sketch
+
 
   LoadCell.begin();
-  //LoadCell.setReverseOutput();
   unsigned long stabilizingtime = 2000;  // tare preciscion can be improved by adding a few seconds of stabilizing time
-  boolean _tare = true;                  //set this to false if you don't want tare to be performed in the next step
-  LoadCell.start(stabilizingtime, _tare);
+  LoadCell.start(stabilizingtime, TARE_AT_START);
   if (LoadCell.getTareTimeoutFlag()) {
     Serial.println("Timeout, check MCU>HX711 wiring and pin designations");
   } else {
@@ -112,20 +112,11 @@ void setup() {
   } else if (LoadCell.getSPS() > 100) {
     Serial.println("!!Sampling rate is higher than specification, check MCU>HX711 wiring and pin designations");
   }
-
-  // Tare
-  if (TARE_AT_START) {
-    LoadCell.tare();
-    // check if tare operation is complete:
-    if (LoadCell.getTareStatus() == true) {
-      Serial.println("Tare complete");
-    }
-  }
 }
 
 void loop() {
   static boolean newDataReady = 0;
-  const int serialPrintInterval = rate;  
+  const int serialPrintInterval = rate;
 
   // check for new data/start next conversion:
   if (LoadCell.update()) newDataReady = true;
