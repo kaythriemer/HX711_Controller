@@ -14,3 +14,6 @@ HX711 Color Control
   * Von Kraft3 bis Kraft4: leuchtet rot
   * Von Kraft4 bis Kraft5: blinkt rot / blau
   * Über Kraft5 wird ein Alarm geschaltet
+
+* Arduino IDE 2.2.1 https://www.arduino.cc/en/software
+* Library used: HX711_ADC 1.2.12 by Olav Kallhovd (https://github.com/olkal/HX711_ADC)
