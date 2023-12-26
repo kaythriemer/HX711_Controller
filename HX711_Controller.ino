@@ -6,27 +6,37 @@
    -------------------------------------------------------------------------------------
 */
 
-/*
-   Settling time (number of samples) and data filtering can be adjusted in the config.h file
-   For calibration and storing the calibration value in eeprom, see example file "Calibration.ino"
-
-   The update() function checks for new data and starts the next conversion. In order to acheive maximum effective
-   sample rate, update() should be called at least as often as the HX711 sample rate; >10Hz@10SPS, >80Hz@80SPS.
-   If you have other time consuming code running (i.e. a graphical LCD), consider calling update() from an interrupt routine,
-   see example file "Read_1x_load_cell_interrupt_driven.ino".
-
-   This is an example sketch on how to use this library
-*/
 
 #include <HX711_ADC.h>
-#if defined(ESP8266) || defined(ESP32) || defined(AVR)
-#include <EEPROM.h>
-#endif
+
+//************************************************
+// Diese Werte können angepasst werden
+//************************************************
+// Power definitions
+const int KRAFT1 = 20;
+const int KRAFT2 = 200;
+const int KRAFT3 = 500;
+const int KRAFT4 = 1000;
+const int KRAFT5 = 1500;
+
+//readout frequency / time between two measures in ms  HX711 fastest is 10HZ(100ms)
+const int rate = 100;
+
+// blink frequency in ms for KRAFT between KRAFT4 and KRAFT5
+const long interval = 100;
+
+//activate debug
+const bool DEBUG = true;
+
+//activate tare during startup
+const bool TARE_AT_START = true;
+//*********************************************
 
 //pins:
 const int HX711_dout = A4;  //mcu > HX711 dout pin
 const int HX711_sck = A5;   //mcu > HX711 sck pin
 
+// Hint: PWM can be used to mix colors, e.g. yellow = red(255) + green(160)
 const int REDPIN = 11;
 const int REDPWM = 255;
 int redState = LOW;
@@ -43,23 +53,6 @@ const int WHITEPWM = 255;
 
 const int ALARMPIN = 5;
 const int ALARMPWM = 255;
-
-
-// Power definitions
-const int KRAFT1 = 20;
-const int KRAFT2 = 200;
-const int KRAFT3 = 500;
-const int KRAFT4 = 1000;
-const int KRAFT5 = 1500;
-
-//readout frequency / time between two measures in ms  HX711 fastest is 10HZ(100ms)
-const int rate = 100;
-
-// blink frequency in ms
-const long interval = 100;
-
-const bool DEBUG = false;
-
 
 unsigned long previousMillis = 0;
 
@@ -91,10 +84,6 @@ void setup() {
 
   float calibrationValue;    // calibration value
   calibrationValue = 696.0;  // uncomment this if you want to set this value in the sketch
-#if defined(ESP8266) || defined(ESP32)
-  //EEPROM.begin(512); // uncomment this if you use ESP8266 and want to fetch this value from eeprom
-#endif
-  //EEPROM.get(calVal_eepromAdress, calibrationValue); // uncomment this if you want to fetch this value from eeprom
 
   LoadCell.begin();
   //LoadCell.setReverseOutput();
@@ -123,11 +112,20 @@ void setup() {
   } else if (LoadCell.getSPS() > 100) {
     Serial.println("!!Sampling rate is higher than specification, check MCU>HX711 wiring and pin designations");
   }
+
+  // Tare
+  if (TARE_AT_START) {
+    LoadCell.tare();
+    // check if tare operation is complete:
+    if (LoadCell.getTareStatus() == true) {
+      Serial.println("Tare complete");
+    }
+  }
 }
 
 void loop() {
   static boolean newDataReady = 0;
-  const int serialPrintInterval = rate;  //increase value to slow down serial print activity
+  const int serialPrintInterval = rate;  
 
   // check for new data/start next conversion:
   if (LoadCell.update()) newDataReady = true;
@@ -191,29 +189,11 @@ void loop() {
       digitalWrite(REDPIN, redState);
       digitalWrite(BLUEPIN, blueState);
     }
-
-    // analogWrite(REDPIN, 0);
-    // analogWrite(GREENPIN, 0);
-    // analogWrite(WHITEPIN, 0);
-    // analogWrite(ALARMPIN, 0);
-    // analogWrite(BLUEPIN, BLUEPWM);
   } else {
     analogWrite(REDPIN, 0);
     analogWrite(GREENPIN, 0);
     analogWrite(BLUEPIN, 0);
     analogWrite(WHITEPIN, 0);
     analogWrite(ALARMPIN, ALARMPWM);
-  }
-
-
-  // receive command from serial terminal, send 't' to initiate tare operation:
-  if (Serial.available() > 0) {
-    char inByte = Serial.read();
-    if (inByte == 't') LoadCell.tareNoDelay();
-  }
-
-  // check if last tare operation is complete:
-  if (LoadCell.getTareStatus() == true) {
-    Serial.println("Tare complete");
   }
 }
