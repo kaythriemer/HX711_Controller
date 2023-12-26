@@ -1,6 +1,6 @@
 HX711 Color Control 
 
-* Eine Wägezelle misst eine Ktaft. Der Ausgang wird durch einen HX711 ausgwertet und per serielle Schnittstelle an einen Arduino übertragen.
+* Eine Wägezelle misst eine Kraft. Der Ausgang wird durch einen HX711 ausgwertet und per serielle Schnittstelle an einen Arduino übertragen.
 *  4 Ausgänge des Arduino steuern mittels PWM die Schalttransistoren der LEDs
    * Weiß
    * Rot
