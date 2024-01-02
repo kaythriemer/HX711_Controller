@@ -19,8 +19,6 @@ const int KRAFT3 = 500;
 const int KRAFT4 = 1000;
 const int KRAFT5 = 1500;
 
-//readout frequency / time between two measures in ms  HX711 fastest is 10HZ(100ms)
-const int rate = 100;
 
 // blink frequency in ms for KRAFT between KRAFT4 and KRAFT5
 const long interval = 100;
@@ -88,6 +86,7 @@ void setup() {
 
 
   LoadCell.begin();
+  LoadCell.setReverseOutput(); //revers output
   unsigned long stabilizingtime = 2000;  // tare preciscion can be improved by adding a few seconds of stabilizing time
   LoadCell.start(stabilizingtime, TARE_AT_START);
   if (LoadCell.getTareTimeoutFlag()) {
@@ -115,23 +114,20 @@ void setup() {
 }
 
 void loop() {
-  static boolean newDataReady = 0;
-  const int serialPrintInterval = rate;
+  static boolean newDataReady = false;
 
   // check for new data/start next conversion:
   if (LoadCell.update()) newDataReady = true;
 
   // get smoothed value from the dataset:
   if (newDataReady) {
-    if (millis() > t + serialPrintInterval) {
+   
       i = LoadCell.getData();
       if (DEBUG) {
         Serial.print("Load_cell output val: ");
         Serial.println(i);
       }
-      newDataReady = 0;
-      t = millis();
-    }
+      newDataReady = false;         
   }
 
 
