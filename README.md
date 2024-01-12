@@ -17,3 +17,6 @@ HX711 Color Control
 
 * Arduino IDE 2.2.1 https://www.arduino.cc/en/software
 * Library used: HX711_ADC 1.2.12 by Olav Kallhovd (https://github.com/olkal/HX711_ADC)
+  * Hinweis: in config.h wurde die Anzahl SAMPLES auf 2 gesetzt.
+  * //number of samples in moving average dataset, value must be 1, 2, 4, 8, 16, 32, 64 or 128.
+  * #define SAMPLES 					2		//default value: 16
