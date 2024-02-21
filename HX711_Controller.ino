@@ -14,17 +14,17 @@
 //************************************************
 // Power definitions
 const int KRAFT1 = 20;
-const int KRAFT2 = 200;
-const int KRAFT3 = 500;
-const int KRAFT4 = 1000;
-const int KRAFT5 = 1500;
+const int KRAFT2 = 800;
+const int KRAFT3 = 1000;
+const int KRAFT4 = 1500;
+const int KRAFT5 = 2000;
 
 
 // blink frequency in ms for KRAFT between KRAFT4 and KRAFT5
 const long interval = 100;
 
 //activate debug
-const bool DEBUG = true;
+const bool DEBUG = false;
 
 //activate tare during startup
 const bool TARE_AT_START = true;
@@ -43,7 +43,7 @@ const int REDPWM = 255;
 int redState = LOW;
 
 const int GREENPIN = 10;
-const int GREENPWM = 160;
+const int GREENPWM = 100;
 
 const int BLUEPIN = 9;
 const int BLUEPWM = 255;
